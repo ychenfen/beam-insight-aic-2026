@@ -1,0 +1,117 @@
+\documentclass[UTF8,a4paper,11pt,fontset=fandol]{ctexart}
+\usepackage[margin=20mm,headheight=14pt,headsep=7mm,footskip=10mm]{geometry}
+\usepackage{amsmath,booktabs,graphicx,xcolor,fancyhdr,tabularx,hyperref,xurl}
+\definecolor{ink}{HTML}{183B37}\definecolor{accent}{HTML}{216B62}\definecolor{muted}{HTML}{647770}\definecolor{warm}{HTML}{A45D34}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent,pdftitle={梁鉴：研发与实验验证佐证材料},pdfauthor={}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\color{ink}梁鉴 / 研发与实验验证}\fancyhead[R]{\small\color{muted}AI+力学 · 开放式赛题}\fancyfoot[L]{\footnotesize\color{muted}内部研发记录 · 全部数据为仿真}\fancyfoot[R]{\small\thepage\ / 6}
+\ctexset{section={format=\Large\bfseries\color{ink},beforeskip=4pt,afterskip=10pt},subsection={format=\normalsize\bfseries\color{ink},beforeskip=10pt,afterskip=5pt}}
+\setlength{\parindent}{2em}\setlength{\parskip}{5pt}\setlength{\emergencystretch}{3em}\linespread{1.1}
+\newcommand{\note}[1]{\par\noindent{\small\color{muted}#1}\par}
+\newcommand{\shot}[2]{\begin{center}\includegraphics[width=#1\linewidth]{../output/evidence/assets/#2}\end{center}}
+\newcommand{\file}[1]{{\small\nolinkurl{#1}}}
+\newcommand{\cmd}[1]{{\small\texttt{#1}}}
+\input{generated/metrics.tex}
+\input{../output/evidence/records/case-macros.tex}
+\begin{document}
+{\noindent\small\color{accent}研发与实验验证佐证材料\hfill 核验日期：2026年10月22日}\par
+\vspace{7mm}{\noindent\fontsize{29}{37}\selectfont\bfseries\color{ink}梁鉴}\par
+\vspace{2mm}{\noindent\fontsize{19}{27}\selectfont\color{ink}环境扰动下的损伤识别}\par
+\vspace{5mm}{\color{accent}\hrule}\vspace{6mm}
+\section*{这份材料证明什么}
+本材料汇集本地原型的实际运行画面、冻结的仿真实验结果、数值测试与来源索引，用于说明作品已实现的功能、可复算的结果及其边界。所有观测均由有限元模型生成，不含实物测量、第三方检测、用户反馈或试点应用证明。
+
+作品把随机树的候选筛选与有限元参数反演连接起来：在六个分区中选择三个可疑位置，将最多两处损伤的22个位置组合缩减为7个；估计局部刚度折减的同时估计整体刚度因子，再用未参与拟合的第4、5阶模态检查模型一致性。
+\subsection*{证据导航}
+\par\noindent\begin{tabularx}{\linewidth}{@{}p{12mm}Xp{48mm}@{}}\toprule
+页码 & 证据及其用途 & 对应原始材料\\\midrule
+2 & 常规识别与健康环境变化：检验界面、求解及解释是否联动 & 三个接口响应中的常规、健康案例\\
+3 & 附加质量：保留失配与复核提示，避免只展示成功案例 & 质量扰动响应、浏览器检查\\
+4 & 六类测试域、四种方法：核对正式实验规模和性能数字 & run1逐例记录与汇总\\
+5 & 10项力学测试、9项数据检查：说明数值实现与复算边界 & 测试输出、双次结果对照\\
+6 & 文件指纹、来源及复算入口：把结论定位到可检查文件 & SHA-256清单、代码与依赖\\\bottomrule
+\end{tabularx}
+\subsection*{记录时间与版本}
+正式实验结果来自2026年10月13日保存的\file{results/run1/}与\file{results/run2/}。本次于2026年10月22日重新运行三个演示案例、执行力学测试，并对已保存的两次实验结果重新做一致性检查；本次没有重新训练全部模型。
+
+材料保留可编辑的LaTeX源文件、截图采集脚本及逐例响应。读者可以从本文的结果表追溯到原始记录，再核对生成该记录的代码与数据版本。
+\vfill\note{证据性质：内部研发与仿真实验佐证。实物验证方案另见项目文档，计划不等于已完成的试验。}
+
+\newpage
+\section*{01\quad 两个正常工况的实际运行}
+三个演示案例均固定观测种子12345，加载模型种子11的已训练权重。截图来自本地页面实际调用\file{/api/diagnose}后的结果；三阶振型暂停在同一显示相位，方便比较。振幅与播放时间为展示缩放，不代表真实位移与频率时间尺度。
+\shot{0.95}{id-instrument.png}
+\note{图1\quad 常规工况。整体刚度估计\IdScale，留出标准化残差\IdResidual，阈值\GateValue；\IdStatus。对应\file{id-response.json}。}
+\shot{1}{healthy-result.png}
+\note{图2\quad 健康梁环境变化。整体刚度估计\HealthyScale，留出残差\HealthyResidual；\HealthyStatus。对应\file{healthy-response.json}。}
+\subsection*{如何解释画面}
+颜色对应模型估计的分区刚度折减，振型由有限元自由度经Hermite插值绘制。健康案例的真实损伤为零，用于检查整体刚度变化是否被误判为局部损伤。界面上的“检查通过”只表示留出模态残差未超过校准阈值，不构成结构安全鉴定。
+\note{这些是新增的功能演示案例，不计入720例正式测试。截图中的单次耗时受机器状态影响，不能替代第4页冻结实验的中位耗时。}
+
+\newpage
+\section*{02\quad 失配案例必须看得见}
+在梁长的$2/3$位置附加集中质量，而识别模型仍按无附加质量梁求解。这一刻意设置的失配用于检查：当观测不能由当前模型合理解释时，系统是否明确要求复核。
+\shot{0.92}{mass-instrument.png}
+\note{图3\quad 附加质量案例。留出标准化残差\MassResidual，高于阈值\GateValue，界面提示\MassStatus。对应\file{mass-response.json}。}
+\shot{1}{mass-result.png}
+\note{图4\quad 同一案例的分区估计、仿真真值与区间。保留错误估计是为了展示失配后果；不能把这些估计当作可信的损伤诊断。}
+\subsection*{三次运行的数值对照}
+\begin{center}\small\input{../output/evidence/records/case-table.tex}\end{center}
+\note{浏览器检查未记录JavaScript运行错误。通过／复核标志依据同一个留出残差阈值；完整观测、真值、AI初值及反演参数均保留在响应JSON内。}
+
+\newpage
+\section*{03\quad 正式实验结果及适用边界}
+三组模型种子为11、29、47。每组使用2400例训练、120例独立校准，以及六类测试域各40例；正式测试共720个工况，四种方法合计2880条预测记录。第1至3阶模态参与拟合，第4、5阶仅用于校核。
+\subsection*{常规域120例：减少反演开销}
+\begin{center}\small\resizebox{\linewidth}{!}{\input{generated/method_table.tex}}\end{center}
+融合方法的中位在线耗时为\HybridTime\,ms，穷举为\PhysicsTime\,ms，后者约为前者的\Speedup 倍；平均前向调用减少\CallSaving\%。纯AI更快，但本实验中的损伤误差更大。融合与穷举的精度接近，本材料不据此声称融合方法具有统计显著的精度优势。
+
+全区MAE对全部六区平均，包含未损伤区；受损区MAE为\HybridDamagedMAE 个百分点，单独列出以避免仅用全区平均低估局部误差。名义90\%六区同时区间的常规域实测覆盖率为\Coverage\%，平均宽度为\Width 个百分点。
+\subsection*{六类测试域：保留失效结果}
+\begin{center}\small\resizebox{\linewidth}{!}{\input{generated/domain_table.tex}}\end{center}
+健康环境变化域中，融合方法的损伤误报为0/120；不估计环境因子的消融方法误报率约44.17\%。高噪声、三处损伤和附加质量各120例均触发复核，但同时出现较大的识别误差，不能把拒判解释为已恢复正确损伤。
+\subsection*{目前证据不能支持的结论}
+结果只适用于本项目的合成数据、梁模型、噪声设定和计算环境。测试中的高噪声是名义噪声标准差的三倍；加密网格由24单元生成、12单元识别；三处损伤违反最多两处损伤假设。均匀损伤与整体刚度变化存在物理不可辨识性，真实夹持柔度、模态漏识别等尚未验证。
+\note{来源：\file{results/run1/summary.json}与\file{records.json}。表格从正式结果自动生成。推理时间不包含离线训练，也不是不同硬件上的性能保证。}
+
+\newpage
+\section*{04\quad 数值正确性与结果复核}
+\subsection*{当前力学测试：10项通过}
+2026年10月22日执行\cmd{.venv/bin/python -m pytest tests -q}，退出码为0。测试覆盖如下；检查的是代码的数学与数值性质，不代表实物准确度。
+\par\noindent\begin{tabularx}{\linewidth}{@{}p{8mm}Xp{62mm}@{}}\toprule
+序 & 检查对象 & 关键判据\\\midrule
+1 & 悬臂梁解析频率 & 前五阶最大相对误差小于$2\times10^{-4}$\\
+2 & 梁端静挠度 & 与$L^3/(3EI)$相对差小于$10^{-9}$\\
+3 & 特征方程与质量正交 & 归一化残差$<10^{-8}$，正交误差$<10^{-10}$\\
+4 & 均匀环境刚度缩放 & 频率按$\sqrt\alpha$缩放，振型不变\\
+5 & 不可辨识边界 & 均匀折减与等效整体刚度给出相同模态\\
+6 & 无噪声反演 & 损伤和环境参数最大误差$<10^{-5}$\\
+7 & 候选组合与模态隔离 & 22/7组合；拟合与留出索引不相交\\
+8 & 有限样本分位数 & 120项输入按校正后的阶次取分位数\\
+9 & 12/24/48单元收敛 & 加密后误差降低，粗网格频差$<0.3\%$\\
+10 & 非法输入处理 & 不合法单元数、损伤值触发异常\\\bottomrule
+\end{tabularx}
+\subsection*{已保存的两次完整实验：9项检查通过}
+本次重新执行\file{scripts/verify.py}，检查数据有限性、划分间观测不重复、2880条记录计数、工况与方法键唯一、参数范围、求解器终止，以及两次实验的非计时记录、全部数组、校准结果一致。记录见\file{review-validation.json}。
+
+两次实验对应先前独立的数据生成、训练与评估运行。本次是对保存文件的重检，未重新训练。计时字段明确排除在一致性判断之外；“求解器成功终止”也不等于证明全局最优。
+\subsection*{来源指纹复核}
+\file{run1/provenance.json}与\file{run2/provenance.json}记录的\file{src/beam.py}和\file{scripts/study.py}哈希均与当前文件一致。本次保留测试输出、浏览器检查、原始接口响应及全长SHA-256清单，分别对应代码正确性、运行状态与文件身份。
+\note{检查输出：\file{output/evidence/records/mechanics-test.txt}、\file{review-validation.json}、\file{browser-check.json}、\file{source-check.json}。完整测试定义位于\file{tests/test_mechanics.py}。}
+
+\newpage
+\section*{05\quad 文件索引与证据来源}
+\subsection*{关键文件指纹}
+下列为SHA-256的前12位，供快速定位；全长哈希、文件大小和路径保留在\file{output/evidence/records/file-manifest.json}。哈希仅证明文件身份与一致性，不构成第三方认证。
+\begin{center}\small\input{../output/evidence/records/hash-table.tex}\end{center}
+\subsection*{复算入口}
+在项目根目录按\file{requirements.txt}准备并激活环境；\cmd{python demo/server.py --port 18766}启动本地原型，\file{scripts/capture_evidence.cjs}采集截图与响应。\cmd{python scripts/study.py --help}列出完整实验参数；\file{scripts/verify.py}比较两套已保存的实验结果。本材料由\file{paper/evidence.tex}编译，可编辑源文件一并保留。
+
+本次附件包收录文档、截图和轻量记录；完整训练模型、数据数组与核心源码仍以项目工程包为准。不能只凭这份PDF重新训练或独立复现全部实验。
+\subsection*{既有方法、开源与AI辅助}
+Euler--Bernoulli梁、有限元、Extra Trees、BIC型选择和共形校准均为既有方法。作品的实现工作在于六分区参数化、候选筛选与环境反演的结合、留出模态校核、实验划分及交互呈现。随机树使用scikit-learn，优化使用SciPy；没有将这些库描述为自研基础算法。
+
+GitHub调研包括pyfe3d、pycba等候选；未将其代码或结果纳入本原型。来源、许可证边界与文献链接见\file{docs/SOURCES.md}。研发及文档制作使用了AI辅助；本次佐证整理、截图采集和简介修订由Codex辅助完成。自动检查不替代参赛团队的人工审核、答辩理解与原创性承诺。
+\subsection*{尚待补充的外部证据}
+目前没有专利、软著、论文录用、合作协议、真实用户反馈或实物试点证明。本文件不以空白证书、虚构评价或计划书替代这些材料。若后续开展实物试验，应保留测量设备、边界条件、原始信号、处理脚本与逐例对照，再单独补充结果。
+\vfill\note{核验日期：2026年10月22日。本文记录作品当前状态，后续新增实物或外部验证应保留独立版本。}
+\end{document}

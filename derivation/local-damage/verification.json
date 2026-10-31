@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "checks": {
+    "all_16_stiffness_integrals_exact": true,
+    "all_16_mass_integrals_exact": true,
+    "element_rigid_translation_zero_energy": true,
+    "element_rigid_rotation_zero_energy": true,
+    "total_translational_mass": true,
+    "constrained_size": true,
+    "symmetry": true,
+    "worked_example": true,
+    "positive_definite_cholesky": true,
+    "energy_loss_identity": true,
+    "damage_derivative": true,
+    "environment_derivative": true,
+    "unit_tip_load_analytic_deflection": true,
+    "uniform_damage_environment_equivalence": true,
+    "general_parameter_equivalence": true
+  },
+  "check_count": 15,
+  "tip_deflection_m": 0.015238095238101584,
+  "analytic_tip_deflection_m": 0.015238095238095236,
+  "total_beam_mass_kg": 0.5832,
+  "scope": "Independent derivation checks; no new experimental measurements or model training.",
+  "source_sha256": "7f7f2ea85e18f7f126fbfbe33ee63dcedd387c6b8aa7c2b396103d0912d2ceb6"
+}

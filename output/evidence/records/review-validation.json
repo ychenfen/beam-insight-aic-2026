@@ -1,0 +1,77 @@
+{
+  "checks": {
+    "all_arrays_finite": true,
+    "no_identical_observations_across_splits": true,
+    "record_count": true,
+    "unique_case_method": true,
+    "bounded_predictions": true,
+    "all_selected_solutions_terminated": true,
+    "retrained_records_equal": true,
+    "all_regenerated_arrays_equal": true,
+    "calibration_equal": true
+  },
+  "all_passed": true,
+  "distinct_observations": {
+    "train_X_11": 2400,
+    "cal_X_11": 120,
+    "id_X_11": 40,
+    "healthy_X_11": 40,
+    "noise_X_11": 40,
+    "mesh_X_11": 40,
+    "triple_X_11": 40,
+    "mass_X_11": 40,
+    "train_X_29": 2400,
+    "cal_X_29": 120,
+    "id_X_29": 40,
+    "healthy_X_29": 40,
+    "noise_X_29": 40,
+    "mesh_X_29": 40,
+    "triple_X_29": 40,
+    "mass_X_29": 40,
+    "train_X_47": 2400,
+    "cal_X_47": 120,
+    "id_X_47": 40,
+    "healthy_X_47": 40,
+    "noise_X_47": 40,
+    "mesh_X_47": 40,
+    "triple_X_47": 40,
+    "mass_X_47": 40
+  },
+  "mesh": [
+    {
+      "elements": 12,
+      "frequencies": [
+        3.269378082364876,
+        21.085719482052493,
+        56.5404750522276,
+        111.64482295585627,
+        188.56622081628808
+      ]
+    },
+    {
+      "elements": 24,
+      "frequencies": [
+        3.269376850041125,
+        21.08539951364368,
+        56.5337383752659,
+        111.59466720934596,
+        188.34428634930228
+      ]
+    },
+    {
+      "elements": 48,
+      "frequencies": [
+        3.2693768628003954,
+        21.08537933824306,
+        56.533310431917684,
+        111.59144453994107,
+        188.32965966867246
+      ]
+    }
+  ],
+  "scientific_repeat_excludes": [
+    "seconds",
+    "wall-clock timings"
+  ],
+  "cases": 720
+}

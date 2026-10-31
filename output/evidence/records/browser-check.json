@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-22",
+  "domains": [
+    "id",
+    "healthy",
+    "mass"
+  ],
+  "observation_seed": 12345,
+  "model_seed": 11,
+  "errors": [],
+  "screenshot_source": "actual local browser rendering; animation paused at third mode",
+  "passed": true
+}

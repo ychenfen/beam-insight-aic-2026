@@ -1,0 +1,92 @@
+{
+  "seeds": [
+    11,
+    29,
+    47
+  ],
+  "ntrain": 2400,
+  "ncal": 120,
+  "ntest_per_domain_per_seed": 40,
+  "domains": [
+    "id",
+    "healthy",
+    "noise",
+    "mesh",
+    "triple",
+    "mass"
+  ],
+  "source_hashes": {
+    "src/beam.py": "7419997f372bcf8b8d035c44caf47a63674457535a9d65110f85e1038ab43d7e",
+    "scripts/study.py": "411bd8764ad03cee1d500c0e9273869d63dac52e24b21c12926773d7030efcd0"
+  },
+  "dataset_array_hashes": {
+    "train_X_11": "0763ebc559e8d5ecaeac2c245506539fdbf2bd646c9541d08ba558f9ceed36ec",
+    "train_Y_11": "a8e09e288c87d58586949b642bc370f738667db4dff50edc0d7c94d7835af424",
+    "cal_X_11": "6b2c2807e69aa293700d4bab2440d2b406856451156b463dc69dcdfe10fdf22b",
+    "cal_Y_11": "5045cabae25f6090513fe447a394b2ff276c067f2e301a083a54917caf2b881b",
+    "id_X_11": "5297bf9cad44fc27871378babf71672e93501fef08451079f4c5098a8ca74715",
+    "id_Y_11": "1042227cc7e998db2b125a4ec98bf26525a6cb08786ea8b1c060a674ff387a70",
+    "healthy_X_11": "901f0bd144a971cd340e60f26a638d9a2ac10890b67c4e0ad4169823c6fa3fcc",
+    "healthy_Y_11": "f86117dacf62d2d1c6b591cb284f0efed4331be6c409020d1bec80a72818b08a",
+    "noise_X_11": "a91121754def6d03bb9e48f39210f4078f4f4ce4bd2bc159832289e849f9c461",
+    "noise_Y_11": "ba2350dbe44600c6e44f4161c69932e8189c766ba6630abf3e643c073af83965",
+    "mesh_X_11": "6fe674e96c7cda9839413bf4005c4379e7cd5d9b254497eee093986323958ae8",
+    "mesh_Y_11": "a266856df38cb1081cddf406d0e241819c2f7bcfc8c1197e09ea4c0bd846ac0c",
+    "triple_X_11": "2c23fc56708e179a366a77335fbb8c53b7d0a00b49877f8d41bfadc3a8437c08",
+    "triple_Y_11": "285d00deb595b7cd862a16de6066f6d311bb84bec4f8b654cb6ed41545d0c698",
+    "mass_X_11": "dc558be96511aef4d79f01d207ab44ee2d25013b5770c567ba1bebb455d89d51",
+    "mass_Y_11": "f4c0c516b35f1cc1cfece9ec2808e3523a7be523904862bc447b4087cad15836",
+    "train_X_29": "812d6ee74ed3d90c6b8a16734abc6c5d0f5ff2bd5509ff51ae8dacbc2db5903b",
+    "train_Y_29": "91c331f1cf0252faea6fac6dce0052aaf9138ca14a974cd1d8d04ee3100e41a7",
+    "cal_X_29": "ade1b652c271f8dc8cbddabe637d76edd69ef7b7f983422eebba2b586a345bec",
+    "cal_Y_29": "c9ca0a1dda9d47312f94c3a6ec829f105c425da0f457cc0aa6a780d81fa79756",
+    "id_X_29": "d0891c912d5d557e9ac318b99834a8aeb3b535f9c440bb9cd58c0fbf0d54970e",
+    "id_Y_29": "07bbfca6914878c9d31524d19442a1af09da8b03b3c6092997791819a2164737",
+    "healthy_X_29": "7762c43ac036a48b2d88cd1f331b1293790ffcf4e4c652396e06f7981601701f",
+    "healthy_Y_29": "3b8dd277ebb02f42e582c69645f32267cfc8bbff02db44656684097f36c10e86",
+    "noise_X_29": "ea6b96075955afb17526c86b0cf81007bbe8c81af2715e5d22153a95a048d483",
+    "noise_Y_29": "5c1ac74e4e472acc4f4355f47c41ae224122f43cfe23fe515231efb6320ab3e1",
+    "mesh_X_29": "2e3f94c5aed17f445926707da6b4bc4881c5bd87897961635e84a7135f701895",
+    "mesh_Y_29": "1ed9cb8fcc9def835b160658ae360b769662b54a57fedfeb0e4e5a91f2b6eab1",
+    "triple_X_29": "da5229382839f9d60cba32050d535bfc267893cbea16371bf56854f699d82fb9",
+    "triple_Y_29": "2b867346ee0a0663dd7adfdea9641ac00c0bea72c1e8afe52efa7207924eae28",
+    "mass_X_29": "bf5f6c578c3a0189f5a1301fd0052b0709300504fad67680912a4b7bd2fd537d",
+    "mass_Y_29": "ed51ab602a1e1483c06c9788ceef1d436df0a6babc3e6bed4cccafd4ce6ebad1",
+    "train_X_47": "c48960138d2162055628432fef94743e57bac89d5755f67d538f71d92a6fd3b3",
+    "train_Y_47": "b428d3a1f163f9a3c5345b1fbaf1a10b8f19ef8f551af903e688bdbe14dc4b83",
+    "cal_X_47": "f3d770d7ba8630bc62a85375d38a5b0064b39b47e75ebebf0f0fa3721068c1fd",
+    "cal_Y_47": "aef77c013d169f49f465d8e025936c92203177d2ac2fd634ea7297c4877d46b6",
+    "id_X_47": "56d919fcdc3c080cc4aec9cfe25ca4fb951a34ec6848595644dbeefb3c5705e1",
+    "id_Y_47": "7c582e24ed4d99d9d6164182168717eded3db14080b54d4fe63f3bcdf44f8232",
+    "healthy_X_47": "28b8159caf1550bd0bc5e300f2ba99d570479f5812bafdcd954c4d2c9bd874f1",
+    "healthy_Y_47": "dd46b860f3127ec246554249502a1114f30886e2c8d2b2ad68b06cc5093cdac8",
+    "noise_X_47": "44fe5d88001f02571bb1aa188e6fd03e44970d5d0a50970ee5e7aa41248de1c8",
+    "noise_Y_47": "0a73f72782510f322cccdaede0234d53f346cb9c4183c60d877f2772c503a842",
+    "mesh_X_47": "baa8c75fc03f0d3b0ce532bdbb57fff7585be49de9894e132ceb73f1452a73c4",
+    "mesh_Y_47": "fc15bfb3d8f110b7afddb2965ec5135fe53c3d4a6d0988dfef18f0576ffa08c4",
+    "triple_X_47": "bd907913cdde10cf85db7fc4c19ff2249d1df7fe9e87e69f40518ba44c87518f",
+    "triple_Y_47": "f19b28b2fc7113396cac8855054f4aeb22c552e8da668dc8585edd89c521c250",
+    "mass_X_47": "731585368a1eec4240cb7b4ec269d6938c5cdf1e5d86ad5880268772d2696b12",
+    "mass_Y_47": "2a08a8d03b02cd28e39dab3a73760c83ee93c89fd84b38442e8bb5e6157f4e73"
+  },
+  "python": "3.14.5",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "machine": "arm64",
+  "timings": [
+    {
+      "seed": 11,
+      "total_seconds": 42.13037845911458
+    },
+    {
+      "seed": 29,
+      "total_seconds": 43.199026749935
+    },
+    {
+      "seed": 47,
+      "total_seconds": 43.900804875418544
+    }
+  ],
+  "synthetic": true
+}

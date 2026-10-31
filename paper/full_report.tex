@@ -1,0 +1,271 @@
+\documentclass[UTF8,a4paper,11pt,fontset=fandol]{ctexart}
+\usepackage[margin=21mm,headheight=14pt,headsep=7mm,footskip=10mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,xcolor,fancyhdr,enumitem,hyperref,xurl,tikz}
+\definecolor{ink}{HTML}{183B37}\definecolor{accent}{HTML}{216B62}\definecolor{muted}{HTML}{647770}\definecolor{warm}{HTML}{B16B45}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent,citecolor=accent,pdftitle={梁鉴：环境扰动下的损伤识别——完整技术报告},pdfauthor={}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\raisebox{-0.6mm}{\includegraphics[height=4mm]{generated/aic_logo.png}}}\fancyhead[R]{\small 2026第八届全球校园人工智能算法精英大赛}\fancyfoot[C]{\small\thepage}
+% 参赛信息：报名后在此填写，封面自动更新
+\newcommand{\TeamName}{}
+\newcommand{\TeamNo}{34636761}
+\newcommand{\coverfield}[2]{\makebox[24mm][s]{#1}：\underline{\makebox[58mm][l]{\hspace{1mm}#2}}}
+\ctexset{section={format=\Large\bfseries\color{ink},beforeskip=4pt,afterskip=11pt},subsection={format=\normalsize\bfseries\color{ink},beforeskip=10pt,afterskip=5pt}}
+\setlength{\parindent}{2em}\setlength{\parskip}{4pt}\setlength{\emergencystretch}{3em}\linespread{1.12}
+\setlist{leftmargin=2em,itemsep=3pt,topsep=3pt}
+\newcommand{\plate}[2]{\begin{center}\includegraphics[width=#1\linewidth]{generated/#2}\end{center}}
+\newcommand{\captionline}[1]{{\small\color{muted}\noindent #1\par}}
+\input{generated/metrics.tex}
+\begin{document}
+\begin{titlepage}
+\thispagestyle{fancy}\fancyfoot{}
+\centering\vspace*{42mm}
+{\heiti\sffamily\fontsize{22}{33}\selectfont 2026年第八届\\全球校园人工智能算法精英大赛\par}
+\vspace{20mm}
+{\heiti\sffamily\fontsize{16}{28}\selectfont 算法主题赛\\（AI+力学·开放式赛题）\\技术报告\par}
+\vspace{30mm}
+{\fangsong\fontsize{14}{30}\selectfont
+\coverfield{团队名称}{\TeamName}\\
+\coverfield{参赛编号}{AIC-2026-\TeamNo}\\
+\coverfield{作品名称}{梁鉴：环境扰动下的损伤识别}\par}
+\end{titlepage}
+\fancyfoot[C]{\small\thepage}\setcounter{page}{1}
+{\noindent\small\color{accent}固体力学 / 动力学与控制}\par
+\vspace{8mm}{\noindent\fontsize{27}{35}\selectfont\bfseries\color{ink}梁鉴}\par
+\vspace{2mm}{\noindent\fontsize{20}{27}\selectfont\color{ink}环境扰动下的损伤识别}\par
+\vspace{3mm}{\noindent\color{muted}AI候选筛选、物理反演与留出模态校核\hfill 2026年10月13日}\par
+\vspace{5mm}{\color{accent}\hrule}\vspace{5mm}
+\section*{摘要}
+梁结构振动频率的变化并不唯一对应损伤：材料模量、环境条件及局部刚度变化均可能改变模态。若直接把频率下降解释为损伤，环境扰动可能产生误报；若完全依赖回归模型给出结论，模型失配时的预测又可能缺少检查依据。本文面向具备健康参考参数、能够提取低阶模态的教学与试验梁，建立一个可复核的损伤识别原型。
+
+将悬臂梁划分为六个损伤区，以整体刚度因子描述均匀环境效应，以分区刚度折减描述局部损伤。Extra Trees回归器根据前三阶模态筛选三个可疑分区，把最多两处损伤的支持集从22个缩减为7个；随后进行有界有限元反演，并使用BIC型准则选择损伤位置组合。第4、5阶模态完全留出，用于一致性检查；独立校准集提供六分区同时误差区间。
+
+采用三个模型种子、六类测试域，共720个独立仿真工况。常规域120例中，融合方法的全区损伤MAE为\HybridMAE 个百分点，穷举物理反演为\PhysicsMAE 个百分点；两者定位完全匹配率均为100\%。融合在线中位耗时\HybridTime\,ms，穷举为\PhysicsTime\,ms，前向调用减少\CallSaving\%。本文主张在本实验设定下减少在线反演开销，不主张精度显著优于穷举。
+
+名义90\%同时区间的常规域实测覆盖率为\Coverage\%。高噪声、三处损伤和附加质量测试各120例均触发复核，同时出现明显识别误差。全部负面结果保留。力学与数值测试共10项通过，两次从数据生成、训练到评估的非计时结果一致。当前证据来自合成模态数据，实物试验方案另列，尚无现场应用或工程安全鉴定结论。
+
+\vspace{3mm}\noindent\textbf{关键词：}结构损伤识别；环境混淆；有限元反演；随机树；留出模态；共形校准。
+\vspace{4mm}\subsection*{阅读导航}
+第2页说明需求与应用范围，第3--6页给出技术选型、力学推导和校核方法，第7--9页给出实验与失效分析，第10--11页说明系统实现及实物验证计划，第12页列出复现材料与参考来源。本文为展开论证的完整报告，两页简版单独保留。
+
+\newpage
+\section{作品概述与需求分析}
+\subsection{问题来自何处}
+振动损伤监测利用结构动力学响应推断刚度变化。Peeters等讨论了激励来源与温度对损伤检测的影响\cite{peeters}，说明模态变化需要结合环境和测量条件解释。本文据此选取一个可以明确控制变量的梁问题：在质量和边界已知的条件下，分离整体刚度变化与少数局部刚度折减。该选题的需求依据是文献与力学分析；尚未开展企业访谈，也未将假定的用户需求写成调研结果。
+
+直接监测某阶频率的下降幅度有两个困难。不同分区对同一模态的灵敏度不同，单一频率难以定位；多个物理因素又可能产生相似的频率变化，需要联合振型和多阶模态。提高数据维数本身仍不能解决全部问题：当两组参数在物理上等效时，再复杂的学习器也不能从相同观测中唯一恢复它们。本文因此先界定可辨识条件，再建立数据驱动方法。
+\subsection{目标场景与可检验的要求}
+目标使用者是开展梁振动教学、模型验证或算法研究的实验人员。预期流程是输入已识别的频率与振型，得到六个分区的刚度折减、整体刚度因子、误差区间及是否需要复核的提示。系统不接收未经处理的现场原始波形，当前接口也不承担自动模态识别任务。
+\begin{center}\small\begin{tabular}{p{27mm}p{66mm}p{43mm}}\toprule
+需求 & 为什么需要 & 对应检查\\\midrule
+环境与损伤分开 & 健康结构也会出现整体模态漂移 & 健康环境变化测试\\
+搜索成本可控 & 多个损伤组合分别反演会增加开销 & 同输入穷举基线\\
+结论可解释 & 需要回到刚度和模态验证估计 & 参数边界、留出残差\\
+误差有范围 & 点预测不能表达有限数据下的不确定性 & 独立校准与覆盖率\\
+失配可见 & 超出建模条件后不应照常给出可信结论 & 噪声、多损伤、质量扰动\\
+复算可执行 & 图表应能追溯到数据和代码 & 逐例记录、双次复算\\\bottomrule
+\end{tabular}\end{center}
+\subsection{研究边界与评价取舍}
+研究对象是线弹性、小变形的细长悬臂梁。预先假设最多两个分区损伤，至少四个区保留健康刚度作为参考；质量、截面及理想固支条件在识别模型中已知。整体刚度因子只是环境效应的简化代理，不能把它直接称为温度估计，更不能解释温度引起的全部夹具和边界变化。
+
+评价同时考虑全区误差、受损区误差、位置识别、健康误报、运行开销和失配拒判。健康区多时，全区平均误差会被大量接近零的分量拉低；只展示这一个指标不足以说明识别能力。相同原因也要求把真实损伤识别和模型适配性检查分开报告。
+
+\newpage
+\section{AI技术选择与整体方案}
+\subsection{为什么让AI筛选位置}
+标准物理反演具有明确的量纲和参数意义，但损伤位置未知时，需要在离散位置组合和连续损伤幅度之间搜索。六分区、最多两处损伤包含$1+6+\binom62=22$个组合。本文将学习器用于提议位置和初始化参数，再让同一物理目标评价候选，使AI输出通过前向力学模型接受检查。
+
+采用scikit-learn的ExtraTreesRegressor\cite{sklearn}，每个模型含160棵树、叶节点最少两个样本、使用全部拟合特征，单线程运行。输入维数固定、样本量为每种子2400条，随机树能够在本地CPU上训练，不需要外部预训练权重或运行期生成式API。本项目没有进行神经网络、其他树模型和大模型之间的系统选型实验，因此这一选择只说明实现与数据条件匹配，不构成对其他技术的优越性证明。
+\plate{1}{workflow.pdf}
+\captionline{图1\quad 数据流与信息隔离。前三阶用于候选生成及反演，后两阶用于检查；真值只进入离线训练、校准与测试评分。}
+\subsection{系统分工与自主实现}
+力学层组装刚度和质量矩阵并输出模态特征；学习层返回损伤评分及整体刚度因子初值；反演层比较候选支持集；校核层计算留出残差和校准区间；展示层将参数、振型与原始记录呈现在同一界面。该分层使某个模块失败时可以追溯原因，例如区分候选位置漏选、反演局部极值和模型本身不适用。
+
+标准梁单元、极端随机树、BIC和共形预测均来自已有方法。项目自主实现的是六分区问题参数化、候选支持集与环境因子反演的耦合、留出模态检查、可复现实验及交互展示。创新定位为针对该问题的系统组合与验证设计；本文不把基础算法当作原创发明，也不声称已经证明全球新颖性。
+\subsection{与纯回归和穷举路线的区别}
+纯AI回归只执行一次模型预测，速度快，但输出没有经过同一物理目标的参数修正。穷举方法检查全部22个支持集，候选位置不受AI筛选限制，构成必要的强基线。融合方案在二者之间取舍：付出若干次小规模物理反演的开销，减少纯回归偏差，同时避免遍历全部位置组合。若真实位置不在前三候选中，后续反演无法凭空恢复该位置；因此候选缩减有明确风险，需要独立测试而不能只报告训练拟合。
+
+\newpage
+\section{力学模型与可辨识性}
+\subsection{模型参数和有限元离散}
+梁长$L=1.2$\,m，矩形截面宽$b=0.03$\,m、高$h=0.006$\,m，弹性模量$E=70\times10^9$\,Pa，密度$\rho=2700$\,kg/m$^3$；$A=bh$，$I=bh^3/12$。沿轴线分为六个等长损伤区，每区两个Euler--Bernoulli单元。忽略剪切变形、转动惯性、阻尼及夹持柔度。每个节点有横向位移和转角，左端两个自由度固定，右端自由。
+
+令单元长$\ell=L/12$、局部坐标$\xi=x/\ell$，位移采用三次Hermite插值：
+\[
+w=(1-3\xi^2+2\xi^3)w_1+\ell(\xi-2\xi^2+\xi^3)\theta_1
+ +(3\xi^2-2\xi^3)w_2+\ell(-\xi^2+\xi^3)\theta_2.
+\]
+由弹性能$U=\frac12\int EI(w'')^2\,dx$和动能$T=\frac12\int\rho A\dot w^2\,dx$，对节点自由度求二次型系数，得到标准单元矩阵：
+\begin{align}
+K_e&=\frac{EI}{\ell^3}\begin{bmatrix}12&6\ell&-12&6\ell\\6\ell&4\ell^2&-6\ell&2\ell^2\\-12&-6\ell&12&-6\ell\\6\ell&2\ell^2&-6\ell&4\ell^2\end{bmatrix},\\
+M_e&=\frac{\rho A\ell}{420}\begin{bmatrix}156&22\ell&54&-13\ell\\22\ell&4\ell^2&13\ell&-3\ell^2\\54&13\ell&156&-22\ell\\-13\ell&-3\ell^2&-22\ell&4\ell^2\end{bmatrix}.
+\end{align}
+令$K_j^0$为第$j$区健康刚度贡献，$d_j$为刚度折减、$\alpha$为整体刚度因子，装配并施加边界后有
+\begin{equation}
+K(\boldsymbol d,\alpha)=\alpha\sum_{j=1}^6(1-d_j)K_j^0,\qquad K\phi_r=\omega_r^2M\phi_r,\qquad f_r=\omega_r/(2\pi).
+\end{equation}
+\subsection{哪些变化不能区分}
+若所有$d_j=c$，则$K=\alpha(1-c)K_0$，任意具有相同乘积$\alpha(1-c)$的参数给出相同模态。这是均匀损伤与整体环境效应的非唯一性，而非求解器精度问题。若只有$\alpha$变化，特征值乘以$\alpha$，频率乘以$\sqrt\alpha$，振型归一化后不变。稀疏损伤假设提供健康区域参考，但仍不能保证任意噪声条件下局部参数都稳定可辨。
+
+这里$d_j$表示模型刚度损失，不直接等于裂纹深度。位移、转角分别与力和弯矩共轭，矩阵不同分块的量纲随自由度而异；特征值单位为s$^{-2}$，频率为Hz。所有损伤、刚度比例与后述对数频率比均无量纲。
+
+\newpage
+\section{特征构造与候选物理反演}
+\subsection{输入、归一化与留出通道}
+在$x/L=1/6,\ldots,1$的六个位置采样振型，按梁端值归一化并统一符号。对本文前五阶模态，梁端不是节点，可以采用该规范；推广到其他结构时必须重新检查，不能在近零参考分量上直接相除。模态按频率升序对应，当前未模拟真实测量中的模态漏识别和错配。
+
+完整观测为五个$\log(f_r/f_r^0)$和30个振型分量，共35维。拟合集$\mathcal I$包含前三阶的三个频率比和18个振型分量，共21维；留出集$\mathcal H$包含后两阶的14维。训练目标为$(d_1,\ldots,d_6,\log\alpha)$。观测噪声在特征层加入，对数频率标准差0.001、归一化振型标准差0.003；各分量独立是本实验的简化假设，不是原始波形经识别后必然具有的误差结构。
+\subsection{支持集内的连续优化}
+学习器输出损伤评分最高的三个分区。枚举其中空集、三个单区及三个双区，共7个候选支持集$S$。令集外$d_j=0$，在各支持集内求解
+\begin{equation}
+\mathrm{RSS}_S=\min_{\substack{0\le d_j\le0.65,\ j\in S\\\log0.65\le\log\alpha\le\log1.35}}
+\sum_{i\in\mathcal I}\left[\frac{g_i(\boldsymbol d,\alpha)-y_i}{\sigma_i}\right]^2,
+\end{equation}
+其中$g$为力学模型特征，$y$为观测。采用SciPy有界最小二乘\cite{scipy}，每候选最大函数评估预算设为35；有限差分产生的实际前向调用另外累计。正值环境参数以$\log\alpha$优化，避免直接在非正刚度上求模态。
+
+在各候选已拟合的结果上计算
+\begin{equation}
+\mathrm{score}(S)=\mathrm{RSS}_S+(|S|+1)\ln21.
+\end{equation}
+若采用独立高斯噪声、已知名义标准差，则负二倍对数似然与加权残差平方和相差一个公共常数；BIC的参数惩罚为参数数目乘以样本数的对数。因此得到上述BIC型形式。它在这里用于模型选择，不能解释为严格支持集后验概率，尤其不应忽略振型归一化后真实噪声可能相关。
+\subsection{初始化、公平比较与漏选风险}
+融合方案使用AI输出初始化损伤与环境参数，初值按边界截入可行域内部。穷举基线检查全部22个支持集，损伤初值固定为0.12、环境因子为1。两者共享前向模型、目标函数和每候选预算；初始化不同是算法组成，因此实测加速同时包含候选缩减与较好初值的作用，不能只归因于22/7。
+
+“穷举”只表示位置组合全部遍历，连续参数仍由局部优化求得。优化器成功终止不等于全局最优。候选集合外的真实损伤可能产生残差增大，也可能被其他参数部分吸收；后续留出检查提供额外信息，但不构成所有漏选必定被发现的保证。
+
+\newpage
+\section{不确定性区间与独立模态校核}
+\subsection{六分区同时区间}
+对每个固定模型使用独立的$n=120$个校准样本。计算样本级分数$s_i=\max_j|\hat d_{ij}-d_{ij}|$，按升序排列；取$\beta=0.1$、$k=\lceil(n+1)(1-\beta)\rceil$，令$q=s_{(k)}$。每个分区输出
+\begin{equation}
+C_j(y)=[\hat d_j-q,\hat d_j+q]\cap[0,0.65].
+\end{equation}
+使用最大分区误差是为了校准“六区同时覆盖”，而不是把六个单独90\%区间误称为整体90\%覆盖。在校准样本与新样本可交换、预测器在校准前固定等条件下，分割共形方法给出边际覆盖解释\cite{cp}。区间裁剪到包含真实参数的物理边界，不会排除原本被区间覆盖的有效真值。
+
+理论覆盖针对随机样本的边际概率，不要求每个有限测试子集恰好达到90\%，也不保证对每一种损伤幅度、每个位置都达到同样水平。校核筛选后的样本分布会改变，原来的边际保证不能自动搬到“通过校核”的子集。本文直接报告实测覆盖，不以名义水平替代测试结果。
+\subsection{留出模态提供第二条证据}
+用估计参数计算留出特征，定义标准化残差
+\begin{equation}
+R=\sqrt{\frac1{14}\sum_{i\in\mathcal H}\left[\frac{g_i(\hat{\boldsymbol d},\hat\alpha)-y_i}{\sigma_i}\right]^2}.
+\end{equation}
+门限为校准残差的95\%有限样本分位数。$R$高于门限时显示“需要复核”，低于门限表示在当前尺度下未检出明显不一致。第4、5阶不参与学习器输入、物理拟合或测试阶段参数修正，避免把同一组残差同时用于拟合与证明拟合质量。
+\begin{center}\small\input{generated/calibration_table.tex}\end{center}
+\captionline{表1\quad 三组模型分别校准。数值由正式校准记录自动生成，区间半径统一换算为百分点。}
+\subsection{区间和门限回答不同问题}
+区间描述与校准样本同分布时的参数预测误差；留出残差检查该参数是否能解释未参与拟合的模态。窄区间不能弥补模型失配，较小残差也不能单独证明参数唯一。界面因此同时给出点估计、区间和校核状态，不把它们合并为一个含义不清的“可信度百分比”。
+
+校准门限只在预设模型与噪声尺度下有效。若传感器、参考梁或工况范围变化，应重新取得独立校准数据，并保留新的冻结记录。调整门限时不能反复查看同一测试集的标签，否则原测试集将参与设计而失去独立评价作用。
+
+\newpage
+\section{实验设计、基线与评价口径}
+\subsection{数据生成与划分}
+模型种子为11、29、47。每种子独立生成2400个训练样本、120个校准样本和六域各40个测试样本。训练、校准和各测试域使用不同随机流；不是对同一条损伤记录反复加噪再分入不同集合。共720个测试工况，四种方法形成2880条预测记录。所有观测来自本项目生成的模态特征，没有使用实测桥梁或外部标注数据。
+
+常规分布下，健康、单损伤、双损伤的概率为0.2、0.5、0.3；位置均匀无放回抽取，损伤幅度均匀取自$[0.08,0.45]$，整体刚度因子均匀取自$[0.88,1.12]$。优化边界比数据生成范围宽，因此反演没有直接读取测试真值的生成区间来强行截断输出。
+\begin{center}\small\begin{tabular}{p{23mm}p{114mm}}\toprule
+测试域 & 与常规域相比的变化及目的\\\midrule
+常规域 & 相同生成分布、独立样本，检验基本识别与推理成本。\\
+健康环境 & 六区损伤固定为零、整体因子与噪声保留，检验环境误报。\\
+三倍噪声 & 频率与振型噪声标准差同时乘3，反演权重不调整。\\
+加密网格 & 24单元生成、12单元识别；频率比仍使用运行模型的健康参考。\\
+三处损伤 & 恰好三个区损伤，检验超出最多两处损伤假设后的表现。\\
+附加质量 & 在$x/L=2/3$加入梁总质量3\%--8\%的点质量，反演不含该参数。\\\bottomrule
+\end{tabular}\end{center}
+\subsection{四种方法和指标}
+比较融合方案、同一学习器的纯AI预测、22候选穷举物理反演及不估计环境因子的消融。消融固定$\alpha=1$，其余仍遍历22个支持集，用于判断环境参数的作用。消融不是最强基线，对其优势不能替代与穷举方案的比较。
+
+全区误差定义为$\mathrm{MAE}_{\rm pp}=100(6N)^{-1}\sum_{i,j}|\hat d_{ij}-d_{ij}|$，单位是百分点；受损区MAE只对真实受损分量求平均。损伤判别阈值预设为0.05，定位F1由全部分区微平均计算；完全匹配率要求一条记录的六个区全部判别正确。健康组单独计算至少一个区被误报的样本比例。
+\subsection{计时和统计解释}
+在线耗时使用同机单CPU线程墙钟，融合计时含AI推理及全部候选反演，排除离线训练。前向调用反映优化过程中求特征的工作量，不等同于机器无关的运行时间。三种模型训练种子提供有限的训练重复，720条工况并不等于720个独立训练模型。本文不将小误差差值作显著性结论，也不以一次计时承诺任何硬件上的固定加速比。
+
+\newpage
+\section{常规工况结果与环境消融}
+\plate{1}{headline.pdf}
+\captionline{图2\quad 常规域的误差、在线中位耗时与平均优化前向调用。前向调用图仅比较两种物理反演，不把纯AI的诊断调用混入优化开销。}
+\begin{center}\small\input{generated/method_table.tex}\end{center}
+\subsection{改善主要体现在哪里}
+融合全区MAE为\HybridMAE 个百分点，受损区MAE为\HybridDamagedMAE 个百分点；穷举全区MAE为\PhysicsMAE 个百分点。两者误差接近，常规样本的定位也均完全匹配。该结果支持候选缩减在当前范围内没有明显损害识别效果，但不能说明筛选永远不会遗漏真实位置。纯AI的全区误差为\AIMAE 个百分点，受损区误差较大，表明物理参数修正在本实验中有实际作用。
+
+融合中位耗时\HybridTime\,ms，穷举\PhysicsTime\,ms，后者与前者之比为\Speedup；平均前向调用减少\CallSaving\%。纯AI中位耗时仅\AITime\,ms，所以融合方案并非所有方法中最快。实际选择应同时考虑允许误差、算力和是否需要物理校核，不能把加入物理反演描述为无成本提升。
+\begin{center}\small\input{generated/seed_table.tex}\end{center}
+\captionline{表2\quad 每个模型种子对应40个常规测试样本；MAE单位为百分点。分种子报告用于观察结果稳定性，不替代更大规模重复训练。}
+\subsection{环境变量的必要性}
+健康环境变化组中，融合方案未出现误报（0/120），忽略环境因子的消融误报率为\HealthyFalseAblation\%。消融将$\alpha$固定为1，无法用整体因子解释刚度变化，因而会尝试把差异分配给局部损伤，造成错误定位。将$\alpha$单列能减少这种混淆，但0/120不是总体误报概率为零的证明。
+
+本轮全部三个种子的训练、校准与评估耗时合计\FullSeconds\,s，属于离线成本。该数值与在线时延分开列出，避免把离线训练隐藏在加速描述之外。模型更新频率越高，离线成本在总使用成本中的占比越大；现有实验尚未测量长期运行的维护开销。
+
+\newpage
+\section{泛化、拒判与失效分析}
+\plate{.96}{robustness.pdf}
+\captionline{图3\quad 六域误差、区间同时覆盖率与校核接受率。各域120例；名义覆盖率不是所有分布下的保证。}
+\begin{center}\small\input{generated/domain_table.tex}\end{center}
+\subsection{有限变化和模型失配的区别}
+加密网格组由24单元生成观测，用12单元反演，融合MAE为\MeshMAE 个百分点。它检查离散精度变化的影响，仍共享相同梁理论、材料和边界类型，不能被描述为跨结构或真实数据泛化。常规域区间覆盖率为\Coverage\%，平均宽度\Width 个百分点；本文保留低于名义90\%的实际数字。
+
+三倍噪声组误差增至\NoiseMAE 个百分点，区间覆盖下降，全部触发复核。因为反演使用的名义噪声尺度保持不变，较大的残差反映观测噪声与原校准条件失配。这不说明模型定位在任何高噪声场景都失效，而说明当前区间和门限不应跨噪声环境直接沿用。
+
+三处损伤组的误差为\TripleMAE 个百分点，完全定位匹配率为0。模型最多允许两处损伤，因此这一结果首先揭示假设上限，而非单纯增加训练数据就能消除的问题。附加质量组误差为\MassMAE 个百分点；质量影响可能被错误归因于刚度变化，说明物理反演同样依赖模型完整性。
+\subsection{拒判的实际含义}
+三类明显扰动各120例均触发复核，但这只覆盖选定扰动强度和位置。弱扰动、不同夹持误差或与损伤近似等效的变化仍可能通过门限；常规域也有2.5\%样本被提示复核。对实际使用者，复核意味着检查测量和建模条件，不等于已经发现真实损伤，更不能将“接受”翻译成结构安全。
+
+\newpage
+\section{项目实施、交互展示与验证}
+\plate{.86}{demo_stage.png}
+\captionline{图4\quad 本地交互演示中的第三阶振型。形状由估计模型计算，颜色表示分区刚度折减；动画振幅放大、时间放慢，均为示意。}
+\subsection{展示内容与计算结果一一对应}
+本地服务读取固定模型与校准参数，按用户选择的工况和随机种子生成新观测，再执行真实推理。六种工况、五阶模态、拖动旋转和暂停操作均可交互。区间图并列估计值与仿真真值；真值仅用于演示评分，不进入反演输入。点击数据区可查看逐分区数值，避免仅凭颜色深浅判断损伤。
+
+三维梁体不是装饰性曲线。由估计刚度矩阵求得特征向量后，使用单元Hermite形函数插值位移，六个分区与反演参数对应。页面区分参与识别的前三阶与留出检查的后两阶，并持续显示残差和门限。需要复核时仍保留估计值供分析，同时改变结论提示；隐藏失败输出会使使用者无法理解失配原因。
+\subsection{实现验证与证据保存}
+核心数值代码完成10项测试，覆盖健康悬臂梁解析频率、端部单位力挠度、特征方程残差、质量正交、环境缩放、均匀损伤等效性、无噪声反演及输入和校准约束。解析频率依据$f_r=\lambda_r^2(2\pi L^2)^{-1}\sqrt{EI/(\rho A)}$，端部挠度依据$L^3/(3EI)$，形成独立于学习器的力学检查。
+
+双次运行均从生成数据和训练模型开始，全部原始数组、校准记录和非计时逐例预测一致；计时允许受运行环境影响。浏览器检查覆盖拖动、模态切换、暂停、失配提示及390像素窄屏布局。计算检查不能代替视觉检查，所以报告另经页面渲染检查公式、图表和字体。所有正式数值由结果文件生成，文稿扩写没有重新调参或替换负面样本。
+
+\newpage
+\section{应用价值、实物验证与后续计划}
+\subsection{当前能够支持的用途}
+本项目已形成从模态特征到损伤估计、误差区间和一致性检查的本地流程，可用于展示环境与损伤混淆、比较纯学习和物理反演、讨论失配后的结论边界。教学与研究价值体现在可调整工况、可追溯数据和可重复实验；尚未取得课程应用反馈、真实用户评价或现场试点，故不量化社会收益与经济收益。
+\subsection{从仿真到实物的验证顺序}
+\begin{enumerate}
+\item \textbf{先测健康梁。}实测尺寸、总质量和夹持长度，记录固定方法；以锤击或其他合适的小幅激励采集响应。优先选择质量影响可校正的传感器，记录传感器位置与附加质量。
+\item \textbf{再校核模态。}在六个观测位置提取前五阶频率与振型，移动测量采用固定参考通道统一相位。至少进行三次重复，检查模态对应、频率变异和测量误差；健康模型尚不一致时不直接诊断损伤。
+\item \textbf{分开刚度与质量扰动。}由实验负责人选择可控连接段或可替换试件实现局部刚度变化，独立记录其标定依据。附加质量单独作为失配工况，不能充当已知损伤标签。
+\item \textbf{冻结校准后评价。}至少预留20\%独立工况，先固定模型、噪声尺度、传感器位置和门限，再揭示测试标签。报告健康误报、定位、幅度误差、区间覆盖和复核比例，不只挑选成功样例。
+\end{enumerate}
+采样率需覆盖第五阶频率并留抗混叠裕量，同时记录采样时长和频率分辨率。温度、夹持和传感器配置与原始波形一并保存。若这些因素导致相关或非高斯模态误差，应重新建模其尺度，不能将仿真中0.001和0.003直接视为仪器精度。
+\subsection{实施安排与资源分工建议}
+以2026年10月28日23:59为官方截止，10月14--18日用于团队审阅和确认试验条件，19--23日用于健康模型与独立工况试验，24--26日用于复评及材料更新，27日完成冻结备份。内部操作目标预留两小时。以上为待执行计划，不代表试验已经完成。
+
+建议队内分别承担力学和算法复核、数据采集与标定、材料与演示三类职责，实际人员尚待填写。算力方面，本地CPU已经支持当前规模；真正新增资源是可重复夹持的试件、激励与传感器、采集条件及实验人员时间。若无法取得这些条件，应保留仿真研究原型定位。
+\subsection{总结与下一步研究}
+现有结果支持在稀疏损伤、已知质量和理想边界下减少在线位置搜索，同时保留可追溯的误差与失配信息。后续优先核查真实模态噪声和边界误差，再研究候选数量、传感器布局和多损伤上限。任何扩展都应重新划分校准与测试并保留强基线，不能只增加模型复杂度而沿用原有结论。
+
+\newpage
+\section{附录：复现材料、来源与AI使用}
+\subsection{材料索引与复现入口}
+正式结果源为\texttt{results/run1/}，\texttt{run2/}为独立重训的复算证据。\texttt{data.npz}保存原始数组，\texttt{records.json}保存每例真值、估计、残差、耗时及状态，\texttt{calibration.json}保存校准分数与门限，\texttt{provenance.json}保存环境、随机种子与核心源文件哈希。图表和结果宏位于\texttt{paper/generated/}，避免论文数字与实验记录分离。
+
+在项目根目录建立环境并安装\texttt{requirements.txt}后，设置\texttt{OPENBLAS\_NUM\_THREADS=1}和\texttt{OMP\_NUM\_THREADS=1}。依次执行：
+\begin{quote}\small\ttfamily
+python -m pytest tests -q\\
+python scripts/study.py --output results/run1\\
+python scripts/study.py --output results/run2\\
+python scripts/verify.py\\
+python scripts/present\_results.py\\
+python scripts/full\_report\_tables.py\\
+bash scripts/build\_papers.sh
+\end{quote}
+复算前应备份原输出，或为实验使用新的输出目录。当前报告是XeLaTeX生成的PDF，源文件\texttt{paper/full\_report.tex}可编辑；两页简版、技术补充、演示代码另行保留。压缩包校验记录对应具体版本，修改任一材料后应重新生成哈希和独立备份。
+\subsection{开源和AI辅助边界}
+pyfe3d、pycba及Structural Health Monitoring Python被用于开源路线调研\cite{pyfe,pycba,shm}，未复制其源码或数据。直接运行依赖包括NumPy、SciPy、scikit-learn与joblib，项目保留依赖版本及来源记录。自写标准梁组装代码不意味着发明梁理论；引用工具和方法的作用应与自主实现分开说明。
+
+Codex辅助完成了附件分析、方案、代码、实验运行、文稿及自动检查，记录日期为2026年10月13日。自动检查不等于团队人工审核，参赛者仍需复核公式、数据、引用及答辩解释。作品运行期使用本地树模型与有限元反演。材料未提供专利、用户应用或实物检测证明，也未执行外部上传或平台提交。
+\vspace{-2mm}
+\begin{thebibliography}{9}\footnotesize\setlength{\itemsep}{2pt}
+\bibitem{peeters} Peeters B, Maeck J, De Roeck G. Vibration-based damage detection in civil engineering: excitation sources and temperature effects. Smart Materials and Structures, 2001, 10: 518--527. \url{https://doi.org/10.1088/0964-1726/10/3/314}.
+\bibitem{cp} Angelopoulos A N, Bates S. A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification. 2021. \url{https://arxiv.org/abs/2107.07511}.
+\bibitem{sklearn} scikit-learn. ExtraTreesRegressor. \url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.ExtraTreesRegressor.html}.
+\bibitem{scipy} SciPy. Optimization and root finding. \url{https://docs.scipy.org/doc/scipy/reference/optimize.html}.
+\bibitem{pyfe} Castro S. pyfe3d. \url{https://github.com/saullocastro/pyfe3d}.
+\bibitem{pycba} pycba. \url{https://github.com/ccaprani/pycba}.
+\bibitem{shm} Structural Health Monitoring Python. \url{https://github.com/alokpalai/structural-health-monitoring-python}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,362 @@
+% !TEX program = xelatex
+\documentclass[UTF8,a4paper,11pt,fontset=fandol]{ctexart}
+\usepackage[margin=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,bm,booktabs,array,longtable}
+\usepackage{xcolor,fancyhdr,hyperref,enumitem,listings}
+\definecolor{ink}{HTML}{16363C}
+\definecolor{accent}{HTML}{356F70}
+\hypersetup{colorlinks=true,linkcolor=accent,urlcolor=accent,pdftitle={局部损伤刚度模型的完整推导},pdfauthor={}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small 梁鉴\quad 局部损伤模型推导}\fancyhead[R]{\small AIC-2026-34636761}\fancyfoot[C]{\thepage}
+\setlength{\parindent}{2em}\setlength{\parskip}{3pt}
+\setlist{nosep,leftmargin=2em}
+\ctexset{section={format=\Large\bfseries\color{ink}},subsection={format=\large\bfseries\color{ink}}}
+\numberwithin{equation}{section}
+\newcommand{\dd}{\mathrm d}
+\newcommand{\T}{^{\mathsf T}}
+\newcommand{\EI}{\mathcal D}
+\lstset{basicstyle=\small\ttfamily,breaklines=true,frame=single,columns=fullflexible}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{ink}局部损伤刚度模型的完整推导}\par\vspace{5pt}
+{\large 从梁弯曲应变能到分区反演与可辨识性}\par\vspace{4pt}
+梁鉴：环境扰动下的损伤识别\quad 技术说明\par
+2026年10月28日
+\end{center}
+\section{目标公式、符号与成立条件}
+本文推导作品中的局部损伤模型
+\begin{equation}\boxed{K(\bm d,\alpha)=\alpha\sum_{j=1}^{6}(1-d_j)K_j^0.}\label{eq:target}\end{equation}
+其物理含义是：在健康参考梁的各分区刚度贡献上，分别施加局部折减，再乘以共同的环境刚度因子。该式由\textbf{等效刚度折减假设}与\textbf{线性梁有限元装配}共同得到；不是不依赖假设的裂纹定律，也不是神经网络推导出的力学规律。
+\begin{center}\small
+\begin{tabular}{p{25mm}p{112mm}}\toprule
+符号 & 含义与单位\\\midrule
+$E_0,I_0$ & 参考弹性模量（Pa）与截面惯性矩（m$^4$）\\
+$\EI_0=E_0I_0$ & 参考抗弯刚度（N$\cdot$m$^2$）\\
+$\ell,L$ & 单元长度与梁总长（m）\\
+$d_j$ & 第$j$分区相对于相同环境健康状态的刚度损失比例，无量纲\\
+$\alpha$ & 健康梁相对参考状态的统一抗弯刚度比例，无量纲、正值\\
+$K_e^0$ & 健康参考单元的$4\times4$局部刚度矩阵\\
+$K_j^0$ & 第$j$区装配并施加约束后的整体刚度贡献，$24\times24$\\
+$K,M$ & 自由自由度上的整体刚度与质量矩阵，均为$24\times24$\\
+$\bm q,\phi_r$ & 自由节点坐标与第$r$阶模态向量\\\bottomrule
+\end{tabular}\end{center}
+本项目采用线弹性、小挠度Euler--Bernoulli梁；截面转角满足$\theta=w'$，忽略剪切变形、转动惯性、阻尼和夹持柔度。损伤区内抗弯刚度按常数比例折减，环境因子在全梁一致。识别时质量和理想固支边界已知且不随损伤改变；实际裂纹若同时改变质量、接触或边界，应另建模型。
+
+梁分为6区、12个单元，每区两个单元。反演先验为最多两个分区损伤，其余区域提供健康参考。\textbf{这个稀疏先验有助于分离环境效应，但不自动保证所有观测条件下参数唯一。}
+
+\newpage
+\section{由节点边界条件推导三次形函数}
+\subsection{单元位移的三次多项式}
+取单元局部坐标$x\in[0,\ell]$，令$\xi=x/\ell$，节点坐标为
+\begin{equation}\bm q_e=[w_1,\theta_1,w_2,\theta_2]\T.\end{equation}
+用三次多项式近似挠度：
+\begin{equation}w(\xi)=a_0+a_1\xi+a_2\xi^2+a_3\xi^3.\end{equation}
+节点条件要求
+\begin{equation}
+w(0)=w_1,\quad w'(0)=\theta_1,\quad
+w(\ell)=w_2,\quad w'(\ell)=\theta_2,
+\end{equation}
+其中撇号表示对$x$求导，所以$\dd/\dd x=\ell^{-1}\dd/\dd\xi$。因此
+\begin{align}
+a_0&=w_1,&a_1&=\ell\theta_1,\\
+a_2+a_3&=w_2-w_1-\ell\theta_1,&
+2a_2+3a_3&=\ell(\theta_2-\theta_1).
+\end{align}
+解得
+\begin{align}
+a_2&=3(w_2-w_1)-\ell(2\theta_1+\theta_2),\\
+a_3&=2(w_1-w_2)+\ell(\theta_1+\theta_2).
+\end{align}
+将各节点变量的系数归并，得到$w=N\bm q_e$，其中
+\begin{align}
+N_1&=1-3\xi^2+2\xi^3,&N_2&=\ell(\xi-2\xi^2+\xi^3),\\
+N_3&=3\xi^2-2\xi^3,&N_4&=\ell(-\xi^2+\xi^3).
+\end{align}
+$N_1,N_3$乘以位移，$N_2,N_4$乘以转角，故后两类形函数带有长度因子；若遗漏$\ell$，刚度矩阵的量纲将出错。
+\subsection{曲率与节点变量的关系}
+弯曲曲率可按符号约定写成$w''$或$-w''$，两者在应变能平方项中给出相同结果。本文使用$\kappa=w''$：
+\begin{equation}
+\kappa=B\bm q_e,\qquad
+B=\begin{bmatrix}
+\dfrac{-6+12\xi}{\ell^2}&
+\dfrac{-4+6\xi}{\ell}&
+\dfrac{6-12\xi}{\ell^2}&
+\dfrac{-2+6\xi}{\ell}
+\end{bmatrix}.
+\end{equation}
+至此，连续曲率场已由4个节点自由度表示；下一步通过能量将其转成节点力与节点位移的关系。
+
+\newpage
+\section{由应变能逐项积分得到单元刚度}
+\subsection{从材料应变能到矩阵二次型}
+设$z$是相对中性轴的截面坐标。梁弯曲的轴向应变为$\varepsilon_x=-z\kappa$，线弹性本构为$\sigma_x=E\varepsilon_x$。单元应变能为
+\begin{align}
+U_e&=\frac12\int_0^\ell\int_A E\varepsilon_x^2\,\dd A\dd x
+=\frac12\int_0^\ell E\left(\int_A z^2\dd A\right)\kappa^2\dd x\\
+&=\frac12\int_0^\ell EI\,(B\bm q_e)^2\dd x
+=\frac12\bm q_e\T\left(\int_0^\ell B\T EI B\dd x\right)\bm q_e.
+\end{align}
+因此$\bm f_e=\partial U_e/\partial\bm q_e=K_e\bm q_e$，且
+\begin{equation}\boxed{K_e=\int_0^\ell B\T EI B\dd x.}\end{equation}
+\subsection{全部独立系数的积分}
+记$p=12\xi-6$，$q=6\xi-4$，$r=6\xi-2$，则
+$B=[p/\ell^2,q/\ell,-p/\ell^2,r/\ell]$且$\dd x=\ell\dd\xi$。
+六个基本积分是
+\begin{align}
+\int_0^1p^2\dd\xi&=48-72+36=12, &
+\int_0^1pq\dd\xi&=24-42+24=6,\\
+\int_0^1pr\dd\xi&=24-30+12=6, &
+\int_0^1q^2\dd\xi&=12-24+16=4,\\
+\int_0^1qr\dd\xi&=12-18+8=2, &
+\int_0^1r^2\dd\xi&=12-12+4=4.
+\end{align}
+利用第3项为第1项的相反数，并利用矩阵对称性，全部10个独立系数为
+\begin{equation}
+\begin{array}{llll}
+k_{11}=12EI/\ell^3,&k_{12}=6EI/\ell^2,&k_{13}=-12EI/\ell^3,&k_{14}=6EI/\ell^2,\\
+&k_{22}=4EI/\ell,&k_{23}=-6EI/\ell^2,&k_{24}=2EI/\ell,\\
+&&k_{33}=12EI/\ell^3,&k_{34}=-6EI/\ell^2,\\
+&&&k_{44}=4EI/\ell.
+\end{array}
+\end{equation}
+于是健康参考矩阵为
+\begin{equation}\boxed{
+K_e^0=\frac{\EI_0}{\ell^3}
+\begin{bmatrix}
+12&6\ell&-12&6\ell\\
+6\ell&4\ell^2&-6\ell&2\ell^2\\
+-12&-6\ell&12&-6\ell\\
+6\ell&2\ell^2&-6\ell&4\ell^2
+\end{bmatrix}.}\label{eq:ke}
+\end{equation}
+
+\newpage
+\section{损伤参数化与整体装配}
+\subsection{为什么是乘以\texorpdfstring{$1-d_j$}{1-dj}}
+定义相同环境条件下的等效刚度损失比例：
+\begin{equation}
+d_j=1-\frac{\EI_{j,\mathrm{dam}}}{\EI_{j,\mathrm{healthy}}},\qquad
+\EI_{j,\mathrm{healthy}}=\alpha\EI_0.
+\end{equation}
+移项得$\EI_{j,\mathrm{dam}}=\alpha(1-d_j)\EI_0$。第$j$区中每个单元的$B$和积分域保持不变，因此
+\begin{align}
+K_e(\bm d,\alpha)
+&=\int_0^\ell B\T\alpha(1-d_j)\EI_0B\dd x\\
+&=\alpha(1-d_j)K_e^0,\qquad e\in\Omega_j.
+\end{align}
+其中$\Omega_j$表示第$j$区包含的单元。$d_j=0$表示健康，$d_j=0.2$表示同环境下抗弯刚度折减20\%。数学模型取$0\le d_j<1$；本作品优化时进一步限制为$0\le d_j\le0.65$，该上限是求解设定。
+\subsection{由能量可加性推导装配}
+设含约束自由度的全梁节点向量为$\widetilde{\bm q}\in\mathbb R^{26}$。布尔提取矩阵$A_e\in\mathbb R^{4\times26}$满足$\bm q_e=A_e\widetilde{\bm q}$。全梁应变能是所有单元能量之和：
+\begin{align}
+U&=\sum_e\frac12\bm q_e\T K_e\bm q_e
+=\frac12\widetilde{\bm q}\T\left(\sum_e A_e\T K_eA_e\right)\widetilde{\bm q},\\
+\widetilde K&=\sum_e A_e\T K_eA_e
+=\alpha\sum_{j=1}^{6}(1-d_j)\widetilde K_j^0,\\
+\widetilde K_j^0&:=\sum_{e\in\Omega_j}A_e\T K_e^0A_e.
+\end{align}
+两个相邻单元共享节点，对应行列上的刚度贡献应\textbf{累加}。每个$\widetilde K_j^0$都是$26\times26$矩阵，仅本区涉及的行列非零；不能直接把不同位置的$4\times4$矩阵相加当成整体矩阵。
+\subsection{固支约束后的形式}
+左端$w_0=\theta_0=0$。令$P\in\mathbb R^{26\times24}$将自由坐标$\bm q$补入两个零，即$\widetilde{\bm q}=P\bm q$。于是
+\begin{equation}
+K=P\T\widetilde KP
+=\alpha\sum_{j=1}^{6}(1-d_j)\underbrace{P\T\widetilde K_j^0P}_{K_j^0}.
+\end{equation}
+这就得到式\eqref{eq:target}。代码删除前两行、前两列，正是这一约束操作。
+
+\newpage
+\section{代入本作品参数与能量自检}
+作品参数为$L=1.2$ m，$b=0.03$ m，$h=0.006$ m，$E_0=70\times10^9$ Pa，$\rho=2700$ kg/m$^3$，共12个等长单元。
+\begin{align}
+A&=bh=1.8\times10^{-4}\ \mathrm{m^2},\\
+I_0&=\frac{bh^3}{12}=5.4\times10^{-10}\ \mathrm{m^4},\\
+\EI_0&=E_0I_0=37.8\ \mathrm{N\,m^2},\qquad \ell=0.1\ \mathrm m.
+\end{align}
+代入式\eqref{eq:ke}，按位移使用m、转角使用rad的坐标约定，单元矩阵数值为
+\begin{equation}
+K_e^0=\begin{bmatrix}
+453600&22680&-453600&22680\\
+22680&1512&-22680&756\\
+-453600&-22680&453600&-22680\\
+22680&756&-22680&1512
+\end{bmatrix}.
+\end{equation}
+矩阵各分块量纲不同：位移--位移块为N/m，位移--转角块为N，转角--转角块为N$\cdot$m（rad视为无量纲）。不能把整个矩阵统称为同一单位的标量刚度。
+\subsection{一个局部损伤示例}
+取$\alpha=0.95$、$\bm d=(0,0.2,0,0,0,0)\T$，则
+\begin{align}
+K&=0.95(K_1^0+0.8K_2^0+K_3^0+K_4^0+K_5^0+K_6^0)\\
+&=0.95K_0-0.19K_2^0,\qquad K_0=\sum_{j=1}^{6}K_j^0.
+\end{align}
+第2区保留参考刚度的$0.95\times0.8=0.76$，其他区保留0.95。相对参考状态第2区的总损失为24\%，但参数$d_2$仍是20\%；它以\textbf{相同环境的健康刚度}为分母。这是说明公式的构造算例，不是新增实验结果。
+\subsection{刚度损失应降低同一位移下的应变能}
+对任意固定$\bm q$，在相同环境因子下
+\begin{equation}
+U_{\mathrm{healthy}}-U_{\mathrm{dam}}
+=\frac{\alpha}{2}\sum_jd_j\bm q\T K_j^0\bm q\ge0.
+\end{equation}
+每个$K_j^0$半正定，因为它由$\int EI B\T B\dd x$装配而来。故非负损伤不增加同一位移场的弯曲能量。单独一个分区贡献矩阵通常不正定；施加固支后，若所有区域保持正刚度，全梁$K$才正定。
+
+\newpage
+\section{从刚度变化到频率与振型变化}
+\subsection{一致质量矩阵}
+为说明损伤如何影响模态，需要同时写出惯性项。忽略截面转动惯性时
+\begin{equation}
+T_e=\frac12\int_0^\ell\rho A\dot w^2\dd x
+=\frac12\dot{\bm q}_e\T M_e\dot{\bm q}_e,\qquad
+M_e=\int_0^\ell\rho A N\T N\dd x.
+\end{equation}
+记$N_i=\ell^{s_i}n_i(\xi)$，其中$(s_1,s_2,s_3,s_4)=(0,1,0,1)$；$n_i$为第2节对应无长度因子的多项式。所有独立积分为
+\begin{equation}
+\left[\int_0^1n_i n_k\dd\xi\right]_{i,k=1}^4
+=\frac1{420}\begin{bmatrix}
+156&22&54&-13\\22&4&13&-3\\54&13&156&-22\\-13&-3&-22&4
+\end{bmatrix}.
+\end{equation}
+例如$\int_0^1(1-3\xi^2+2\xi^3)^2\dd\xi=13/35=156/420$。加回$\ell^{1+s_i+s_k}$后，得到
+\begin{equation}
+M_e=\frac{\rho A\ell}{420}\begin{bmatrix}
+156&22\ell&54&-13\ell\\
+22\ell&4\ell^2&13\ell&-3\ell^2\\
+54&13\ell&156&-22\ell\\
+-13\ell&-3\ell^2&-22\ell&4\ell^2
+\end{bmatrix}.
+\end{equation}
+按同样方式装配和约束：$M=P\T(\sum_e A_e\T M_eA_e)P$。本模型中$d_j$只改变刚度，$M$保持不变；附加质量案例用于检验这一假设失配时的表现。
+\subsection{自由振动特征方程}
+由拉格朗日方程，在线性无阻尼、无外力条件下
+\begin{equation}M\ddot{\bm q}+K\bm q=0.\end{equation}
+令$\bm q(t)=\phi_r\cos(\omega_rt+\beta)$，得到
+\begin{equation}\boxed{K\phi_r=\omega_r^2M\phi_r,\qquad f_r=\frac{\omega_r}{2\pi}.}\end{equation}
+因此损伤识别的物理链条为：$\bm d,\alpha\rightarrow K\rightarrow$特征值与特征向量$\rightarrow$频率与振型。$d_j$不等于频率下降的百分比；一阶频率变化也不能直接给出全部六区的损伤。
+
+\newpage
+\section{给定观测后，如何反求局部损伤}
+\subsection{实际使用的观测量}
+本作品在$x/L=1/6,\ldots,1$处取振型分量，按梁端值归一化：
+\begin{equation}
+\psi_{rk}=\frac{\phi_r(x_k)}{\phi_r(L)},\qquad
+z_r=\log\frac{f_r}{f_r^0}.
+\end{equation}
+仅当参考分量$\phi_r(L)$不为零且不接近零时，这一归一化才稳定。本项目所用前五阶模态满足所需条件；推广到其他结构要重新核查。
+完整特征为5个对数频率比与$5\times6=30$个振型分量，共35维。拟合集$\mathcal I$为前3阶，共$3+3\times6=21$维；留出集$\mathcal H$为后2阶，共14维。端点归一化分量是常数，不能把21个记录分量直接理解为21个独立的可辨识信息。
+\subsection{有界加权最小二乘}
+将力学模型输出记为$g(\bm d,\alpha)$，观测记为$y$。对某个候选损伤位置集合$S$，固定$d_j=0$（$j\notin S$），求解
+\begin{equation}
+\mathrm{RSS}_S=\min\limits_{\substack{0\le d_j\le0.65\ (j\in S)\\
+\log0.65\le\eta\le\log1.35}}
+\sum_{i\in\mathcal I}
+\left[\frac{g_i(\bm d,e^\eta)-y_i}{\sigma_i}\right]^2,
+\qquad\eta=\log\alpha.
+\end{equation}
+以$\eta$为优化变量确保$\alpha=e^\eta>0$。作品对数频率噪声尺度设为0.001，归一化振型分量为0.003。这些数值是仿真设定；实测时需重新估计，不能沿用为通用测量误差。
+
+六区最多两处损伤共有$1+6+\binom62=22$个支持集。AI先提议3个可疑区，再枚举空集、单区和双区，共$1+3+\binom32=7$个集合。每个集合仍由相同物理目标估计损伤程度和环境参数。代码以
+\begin{equation}\mathrm{Score}_S=\mathrm{RSS}_S+(|S|+1)\log21\end{equation}
+这一BIC型分数比较候选，惩罚额外参数。其形式对应已知噪声方差的加权残差假设；不把分数最小解释为已证明全局最优或已确定真实裂纹。
+\subsection{独立模态校核}
+拟合后使用未参与求解的第4、5阶计算
+\begin{equation}
+R=\sqrt{\frac1{14}\sum_{i\in\mathcal H}
+\left[\frac{g_i(\hat{\bm d},\hat\alpha)-y_i}{\sigma_i}\right]^2}.
+\end{equation}
+超过校准门限时提示复核测量和模型；通过校核也不构成结构安全鉴定。
+
+\newpage
+\section{频率灵敏度：损伤位置为什么重要}
+本节给出解释公式，\textbf{不是当前程序额外使用的反演算法}。假设特征值为单根、参数变化较小且质量矩阵不变，令$\lambda_r=\omega_r^2$。对
+$K\phi_r=\lambda_rM\phi_r$求微分，得
+\begin{equation}
+(\dd K)\phi_r+K\dd\phi_r
+=(\dd\lambda_r)M\phi_r+\lambda_rM\dd\phi_r.
+\end{equation}
+左乘$\phi_r\T$，利用$K,M$对称以及$\phi_r\T K=\lambda_r\phi_r\T M$，含$\dd\phi_r$的两项抵消：
+\begin{equation}\boxed{
+\dd\lambda_r=\frac{\phi_r\T(\dd K)\phi_r}{\phi_r\T M\phi_r}.}
+\end{equation}
+由目标公式直接得到
+\begin{equation}
+\frac{\partial K}{\partial d_j}=-\alpha K_j^0,\qquad
+\frac{\partial K}{\partial\alpha}=\sum_j(1-d_j)K_j^0=\frac K\alpha.
+\end{equation}
+所以
+\begin{align}
+\frac{\partial\lambda_r}{\partial d_j}
+&=-\alpha\frac{\phi_r\T K_j^0\phi_r}{\phi_r\T M\phi_r},\\
+\frac{\partial\log f_r}{\partial d_j}
+&=-\frac{\alpha\phi_r\T K_j^0\phi_r}{2\phi_r\T K\phi_r},\qquad
+\frac{\partial\log f_r}{\partial\log\alpha}=\frac12.
+\end{align}
+在健康参考状态$\bm d=0,\alpha=1$处，定义第$r$阶模态在第$j$区的应变能占比
+\begin{equation}
+\gamma_{rj}=\frac{\phi_r\T K_j^0\phi_r}{\phi_r\T K_0\phi_r},
+\qquad\gamma_{rj}\ge0,\qquad\sum_j\gamma_{rj}=1.
+\end{equation}
+一阶展开便得到
+\begin{equation}\boxed{
+\Delta\log f_r\approx\frac12\Delta\log\alpha
+-\frac12\sum_j\gamma_{rj}\Delta d_j.}\label{eq:sensitivity}
+\end{equation}
+相同程度的损伤，若位于该模态弯曲能量占比大的区域，对该阶频率的影响就较大。不同模态的$\gamma_{rj}$不同，使用多阶模态有助于定位；如果不同位置的灵敏度很接近，反演仍可能不稳定。
+
+式\eqref{eq:sensitivity}是小扰动近似；对较大损伤不能直接用它代替完整特征值计算。若$M$也变化，分子须改为$\phi_r\T(\dd K-\lambda_r\dd M)\phi_r$；忽略这一项可能把附加质量误解释成刚度损失。
+
+\newpage
+\section{不可辨识情形与参数含义的边界}
+\subsection{均匀损伤与环境变化只能识别乘积}
+若六个区都发生相同比例损伤$d_j=c$，则
+\begin{equation}
+K=\alpha(1-c)\sum_jK_j^0=\alpha(1-c)K_0.
+\end{equation}
+记$\beta=\alpha(1-c)$，固定质量时
+\begin{equation}
+f_r=\sqrt\beta f_r^0,\qquad \phi_r\ \text{保持相同形状}.
+\end{equation}
+例如$(\alpha,c)=(0.9,0)$与$(1,0.1)$均给出$K=0.9K_0$，因此\textbf{全部频率与振型都相同}，增加模态阶数也无法在此模型内区分两者。
+
+更一般地，刚度只依赖六个乘积$\beta_j=\alpha(1-d_j)$。若不加入健康参考、稀疏性或独立环境观测，对某个正数$t$取
+\begin{equation}
+\alpha'=t\alpha,\qquad d_j'=1-\frac{1-d_j}{t},
+\end{equation}
+只要新参数仍满足允许范围，就有$\alpha'(1-d_j')=\alpha(1-d_j)$，因而产生同一刚度矩阵。最多两区损伤的先验通常排除这种把所有区域一起改变的变换，但局部唯一性仍需观测灵敏度支持。
+\subsection{局部可辨识性的检查条件}
+对一个固定支持集，设未知量$\theta=(d_j:j\in S,\eta)$，标准化特征的Jacobian为
+\begin{equation}
+J_{ik}=\frac1{\sigma_i}\frac{\partial g_i}{\partial\theta_k}.
+\end{equation}
+在参数内点的通常局部分析中，$J$满列秩是稳定区分参数所需的重要条件；很小的奇异值意味着某些参数方向难以区分、噪声会被放大。满列秩本身不证明全局唯一，也不证明有限噪声下精度足够。边界点还需结合可行方向分析。
+\subsection{刚度折减为何不直接等于裂纹深度}
+$d_j$表示该分区的\emph{等效}抗弯刚度损失。即使在理想化的均匀减薄例子中，若$E,b$不变且截面高度变为$h'=h(1-r)$，也只有
+\begin{equation}
+\frac{I'}{I}=(1-r)^3,\qquad d=1-(1-r)^3,
+\end{equation}
+而非$d=r$。真实局部裂纹涉及裂纹位置、张闭状态与局部柔度，此减薄关系也不能直接套用。该例只说明几何损失比例与刚度损失比例是不同概念；若真正减薄，质量也变化，已超出当前仅折减刚度的识别假设。
+
+\newpage
+\section{代码对应、独立核算与答辩表达}
+\subsection{与现有实现逐项对应}
+\begin{center}\small
+\begin{tabular}{p{38mm}p{100mm}}\toprule
+数学对象 & 项目\texttt{src/beam.py}中的对应实现\\\midrule
+$K_e^0$ & \texttt{k = E*I/h**3 * array(...)}；这里局部变量\texttt{h}是单元长，不是截面高\\
+$\widetilde K_j^0$ & \texttt{ks[z][np.ix\_(ids,ids)] += k}，按区累加单元贡献\\
+$K_j^0,M$ & \texttt{self.ks=ks[:,2:,2:]}和\texttt{self.M=M[2:,2:]}施加固支\\
+$\alpha(1-d_j)$ & \texttt{scale*(1-d)}，其中\texttt{scale}对应$\alpha$\\
+$K=\sum_j\alpha(1-d_j)K_j^0$ & \texttt{np.einsum('i,ijk->jk',scale*(1-d),self.ks)}\\
+$K\phi=\lambda M\phi$ & \texttt{eigh(K,M,...)}；\texttt{sqrt(val)/(2*pi)}输出Hz\\
+有界反演 & \texttt{invert}中使用\texttt{least\_squares}，以\texttt{exp}还原环境因子\\\bottomrule
+\end{tabular}\end{center}
+\subsection{随文独立核算脚本}
+同目录\texttt{verify\_derivation.py}使用Python标准库，以有理数积分逐项检查全部16个刚度系数、16个质量系数；独立装配26自由度的梁，约束后检查24自由度矩阵，并核对分区加权、对称性、正定性、能量损失与参数导数。另以端部单位力检验
+\begin{equation}
+w(L)=\frac{FL^3}{3E_0I_0}
+=0.015238095238\ \mathrm m\quad(F=1\ \mathrm N),
+\end{equation}
+以及健康梁质量$\rho AL=0.5832$ kg。运行方式：
+\begin{lstlisting}
+python3 verify_derivation.py
+\end{lstlisting}
+当前执行结果保存在\texttt{verification.json}。这些是本推导的数学与实现自检，\textbf{不属于实物试验，不新增原作品720例实验数据}。
+\subsection{答辩时可以这样说明}
+“我们用相同环境下抗弯刚度的损失比例定义分区损伤。Euler--Bernoulli梁单元刚度由弯曲应变能积分得到，与抗弯刚度成正比，因此某区损伤$d_j$就使该区单元矩阵乘以$1-d_j$。把同一区域的单元装配为$K_j^0$，再把各区贡献相加，并乘以统一环境因子$\alpha$，就得到整体刚度公式。随后由模态特征方程计算频率与振型，与观测比较来反求损伤。该损伤量是等效刚度折减，并不直接代表裂纹深度。”
+
+本说明以项目\texttt{paper/full\_report.tex}力学模型部分和\texttt{src/beam.py}为实现依据。形函数、能量法与标准梁单元矩阵属于经典有限元方法，不作为本作品原创算法。本文补齐计算步骤和解释，保留原项目的参数与适用边界。
+\end{document}

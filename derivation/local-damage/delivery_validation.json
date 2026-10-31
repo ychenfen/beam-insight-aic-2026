@@ -1,0 +1,17 @@
+{
+  "status": "verified_locally",
+  "date": "2026-10-28",
+  "pages": 10,
+  "checks_passed": 15,
+  "visual_review": "All 10 rendered pages reviewed; Chinese text, equations, tables and page boundaries checked.",
+  "fonts": "all embedded",
+  "chinese_characters": 3201,
+  "pdf": "/Users/yuchenxu/Desktop/阳光力学/output/pdf/局部损伤刚度模型_完整推导.pdf",
+  "sha256": {
+    "main.tex": "7f7f2ea85e18f7f126fbfbe33ee63dcedd387c6b8aa7c2b396103d0912d2ceb6",
+    "main.pdf": "166387bc91e1180a94f4b19f015a040786f703db3cd53269532661e9ec0c50cf",
+    "verify_derivation.py": "75a3f991405e57d65815e9213a0f8d80fe690d3ae243db378d2d743d3b5708cd",
+    "verification.json": "79e666e3acac6909bafd2df60feab9a24d5a25a8b9bbafcb545abfd8cbe03abf",
+    "README.md": "b8998f9b04c869c8b7afa60789d6d368bdf610655fedef62261cab820b979683"
+  }
+}

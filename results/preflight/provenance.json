@@ -1,0 +1,50 @@
+{
+  "seeds": [
+    11
+  ],
+  "ntrain": 300,
+  "ncal": 20,
+  "ntest_per_domain_per_seed": 3,
+  "domains": [
+    "id",
+    "healthy",
+    "noise",
+    "mesh",
+    "triple",
+    "mass"
+  ],
+  "source_hashes": {
+    "src/beam.py": "7419997f372bcf8b8d035c44caf47a63674457535a9d65110f85e1038ab43d7e",
+    "scripts/study.py": "411bd8764ad03cee1d500c0e9273869d63dac52e24b21c12926773d7030efcd0"
+  },
+  "dataset_array_hashes": {
+    "train_X_11": "a471cf051291e24007b0adad668d22f3334c5b2f19f42cd1a44c9f1bff12101f",
+    "train_Y_11": "b623001e06b7e99fb879ba2449aeabd85754a2671944443a6815d268e0923ce7",
+    "cal_X_11": "c9da870dc19ccf3cf0bafdbb90d5e1582da6bb294c43b01d67e261e6fc9fcce3",
+    "cal_Y_11": "e077548cb595923b8ffe6c28899baa2a198fdd4c62f3cad70452bb548dbb79ef",
+    "id_X_11": "e5a16e748ec52c82222954fb4df9f2d7acf5f8b9d2ea49d81557eac025b65af8",
+    "id_Y_11": "fcfec911d746129acdd2c2dd08df7ffc71a594510434325818036d34ad23c1f8",
+    "healthy_X_11": "48ee2d67058af840dbc78b83c6a36412e22a290fe780a23ac2cbc999654a22a5",
+    "healthy_Y_11": "df51858fca6a930a954db2e876b5bf18b803f69331fe88f531dcd4c3e9c757af",
+    "noise_X_11": "9db40eb766561471bddd85fc629ee6b9174ce9a2628df7561652d728d85fce39",
+    "noise_Y_11": "74a715431feb60a01bb04880e2ff29e4cfc3c40eab19795e151376e87e4467cb",
+    "mesh_X_11": "827277ebe380b85c8759726e45610d6d3b8f654bbb30c92d6e20724a2e760033",
+    "mesh_Y_11": "cdf7684db236bbf7d8f9df24f584d5357385017ed286b5e21f56d61d51710d61",
+    "triple_X_11": "395fb61ed83d9cec5ec630c18f8caad6104a24a9b9465bd360749f31c98ba3b5",
+    "triple_Y_11": "5bedb1477d42264a4f746d9aa608d942144b4984669b7a821ba8336b80e64ec3",
+    "mass_X_11": "d60ccd3ca15ce2c64cdab82d641311e20b87e842f255913524b3b890b11d75d0",
+    "mass_Y_11": "c0b549c173b5c9585eb02bdf04efde9cfb6d7e9953fb3190f576a05b4b4b910b"
+  },
+  "python": "3.14.5",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "machine": "arm64",
+  "timings": [
+    {
+      "seed": 11,
+      "total_seconds": 3.689764665905386
+    }
+  ],
+  "synthetic": true
+}

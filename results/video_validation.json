@@ -1,0 +1,62 @@
+{
+  "status": "verified_locally",
+  "date": "2026-10-22",
+  "video": "/Users/yuchenxu/Desktop/阳光力学/output/video/AIC-2026-34636761-开放式赛题-梁鉴-演示视频.mp4",
+  "sha256": "e975b28ee19784032486a178823c03fcd5bf5083abe042cc78b86622cc660001",
+  "duration_seconds": 219.570333,
+  "bytes": 18934550,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "frame_rate": 30,
+  "codecs": [
+    "h264",
+    "aac"
+  ],
+  "checks": {
+    "format_and_limits": true,
+    "audio_video_duration_agree": true,
+    "full_decode": true,
+    "no_black_segments": true,
+    "no_long_silence_or_clipping": true,
+    "no_blank_white_or_black_frames": true,
+    "sync_marker_removed": true,
+    "sync_alignment": true,
+    "browser_recording_passed": true,
+    "regular_actual_case": true,
+    "healthy_actual_case": true,
+    "mass_actual_case": true,
+    "demo_values_match_narration": true,
+    "reported_metrics": true,
+    "subtitle_count": true
+  },
+  "decoded_frame_count": 6583,
+  "audio_peak_db": -1.4,
+  "longest_detected_silence_seconds": 1.592792,
+  "alignment_quantization_seconds": 0.04,
+  "visual_review": {
+    "completed": true,
+    "sampled_frames": 48,
+    "scope": "All sampled sentence midpoints and cut boundaries; selected full-resolution demo and metric frames."
+  },
+  "synthetic_voice": "macOS Tingting, disclosed on screen",
+  "actual_demo_domains": [
+    "id",
+    "healthy",
+    "mass"
+  ],
+  "sources": {
+    "output/video/AIC-2026-34636761-开放式赛题-梁鉴-演示视频.mp4": "e975b28ee19784032486a178823c03fcd5bf5083abe042cc78b86622cc660001",
+    "output/video/AIC-2026-34636761-开放式赛题-梁鉴-演示视频.srt": "bdc0b869a40afdd4a6bb308e4d6c690d35f48d890798d435e7068d0380790b73",
+    "output/video/配音稿.md": "081357d201e25d3ea8d913c231740df7233a9dc90d2e5cc359b4d149f5a6d22b",
+    "video/storyboard.json": "cddd1b05c6655014a73705831673ff3204044b925e6fee6ebc807d8afdf4bdf3",
+    "video/index.html": "09af024ab47c1ae8ef495c2676db9a31c60f3487e76a2046b7478f00733863bb",
+    "video/video.css": "e46a2f8e543202ce9749263c6340369fbb8aaa977201f4ef6da58bec2daae422",
+    "video/video.js": "409c08c1716b9ebdff4fd4a52bb651c21eec748c94fb811fa8253d517f87e66d",
+    "work/video/timeline.json": "515801886faa0c04524e8508940f179dc0afcebe1b49d62d4496124bfa0a5afb",
+    "work/video/encoding.json": "877840fefe8c3ec6b7a338ab87d26d6e32e2eef6e4ee25f9ef5bbcc07ff5c752",
+    "work/video/recording-check.json": "af18ea5b9cb80a0cb4d16bd54723bb65e49c367f25a10e6c52a306ddeb3186a9"
+  },
+  "uploaded": false
+}

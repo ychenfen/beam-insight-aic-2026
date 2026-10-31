@@ -1,0 +1,55 @@
+{
+  "status": "verified_locally_pending_team_review",
+  "pdfs": {
+    "技术报告": {
+      "pages": 2,
+      "bytes": 248375,
+      "sha256": "8a624bbe63527cd9526d5662e1f170b40fc886f6e51742912aef36476a7000e3",
+      "chinese_characters": 1405,
+      "non_whitespace_characters": 2852
+    },
+    "技术补充": {
+      "pages": 6,
+      "bytes": 369981,
+      "sha256": "df16743f80c774fe5e421d785e78543fbe079b1fb108fb0b51bcbcf267374725",
+      "chinese_characters": 3151,
+      "non_whitespace_characters": 6673
+    },
+    "答辩演示": {
+      "pages": 10,
+      "bytes": 380917,
+      "sha256": "e16de8e01f69d03c9a59219158e4c199ff7a27b5548514cc89be3d7173b6feea",
+      "chinese_characters": 983,
+      "non_whitespace_characters": 2061
+    },
+    "完整技术报告": {
+      "pages": 12,
+      "bytes": 644750,
+      "sha256": "38763aae39892eca00e956c8795095fb7632995f5756d6b0cba3dc5ae59eb1a5",
+      "chinese_characters": 7687,
+      "non_whitespace_characters": 12147
+    }
+  },
+  "zip": {
+    "path": "submission/梁鉴_完整稿审阅包_待补团队编号_20261013.zip",
+    "files": 73,
+    "bytes": 88056513,
+    "sha256": "ad43be46917e7b9d943f3e7ecd3ac988664e0fe32da327725aa5006d5543b255",
+    "integrity": "passed",
+    "utf8": "passed"
+  },
+  "independent_backup": "/Users/yuchenxu/Documents/AIC_阳光力学_独立备份/20261013-184600",
+  "backup_hashes": "all matched",
+  "pending": [
+    "team identifier and name",
+    "human review",
+    "physical experiment evidence",
+    "optional demo video",
+    "external upload and submission"
+  ],
+  "restored_files_opened": {
+    "npz": 2,
+    "models": 6,
+    "pdf": 4
+  }
+}

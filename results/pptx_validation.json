@@ -1,0 +1,59 @@
+{
+  "status": "verified_locally",
+  "counts": {
+    "slides": 10,
+    "text_runs": 172,
+    "charts": 4,
+    "tables": 2,
+    "pictures": 1,
+    "embedded_workbooks": 4,
+    "speaker_notes": 10
+  },
+  "zip_integrity": "passed",
+  "chart_data_match_run1": true,
+  "render_engine": "LibreOffice 26.2.2.2 + Poppler",
+  "visual_review": {
+    "pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "findings": "All pages viewed; no observed clipping or overlap."
+  },
+  "render_hashes": {
+    "work/pptx/render-01.png": "d5ae8674b4cb5b58607784376d762ba1c303161ab689d2d6b5cc8bd2658f9104",
+    "work/pptx/render-02.png": "095fbed20fa6094b76a2ec2a4f2536958f8cfac133cb649b46cfc5d4098b975f",
+    "work/pptx/render-03.png": "dcaa8d9c476700053ab7af7dad33b6bfb63fd2d6bb42d00507e155d34be2de38",
+    "work/pptx/render-04.png": "5f38837c63ed68b2ac250e45291d37288d78b189ae99c1b045bfca94d34b9390",
+    "work/pptx/render-05.png": "1bdba63e97720800550421fa564d3256915d03e771f7c76ddc692671cd4b09f8",
+    "work/pptx/render-06.png": "19472413034e3965624898113e9bcef81f32fc6a3c7b7fdb0cb781beb2c001f8",
+    "work/pptx/render-07.png": "7cbba4d4f69a184bda54d1160c27bd270fd953f6b5bb032c80c994cdce7cb3eb",
+    "work/pptx/render-08.png": "7cbc7dcc0eca2b4b7a8b140b332cdbb91a2756dfd27765f68ac10916ccc44f3b",
+    "work/pptx/render-09.png": "e4f3e52422513b824daee87b8e5c3d588cbd81eb4155fe00daacf6242aa63e4b",
+    "work/pptx/render-10.png": "c0024710d85a08998d1ba272b99ce8373594799df9ef3dc7f8879a956e0d4c3b"
+  },
+  "artifact_hashes": {
+    "output/pptx/答辩演示_可编辑版.pptx": "1811598da89845723ed11cd3dd74cb658a7797f275fabebc0f6fd35be96af97c",
+    "output/pptx/答辩演示_可编辑版.pdf": "1e1b12b63128fac346883c75d4119b9a70cd7c2106e094e83eeb2d46768f1164",
+    "scripts/build_editable_pptx.cjs": "ae17c6c77eeb3a3b3f3405344337fdc056511990f18032d144b6d0a3ae44f78c",
+    "scripts/verify_editable_pptx.py": "3739148289ceb36865158f7438b3f8058b25bb9b7f5a3a5b5168c7bde2d7418f",
+    "results/run1/summary.json": "dcff81286cb57450f47c34204f717632b02a5650ae757fe201514a6d651543b5",
+    "paper/generated/demo_stage.png": "e31bf2e03965b81aa0ae65052a84fc2c923f85bb45aa3e409a89cef13e36dcff",
+    "entry.json": "d444d4150b6e51611d6700a920273991cc63b39220980c0bcd76a2380fc3b7e5",
+    "output/pptx/编辑说明.md": "30a5b4f659d87ea803f3aeee16b22d82e9c9ea775e73af05b6f9bcaae80e0d45"
+  },
+  "backup": "/Users/yuchenxu/Documents/AIC_阳光力学_独立备份/editable-pptx-20261021-165128",
+  "backup_hashes": "matched",
+  "limitations": [
+    "Only the 3D demo screenshot is raster; other content uses native objects.",
+    "Old contest ZIP has not been regenerated.",
+    "No external upload or submission."
+  ]
+}

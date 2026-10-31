@@ -1,0 +1,14 @@
+{
+  "errors": [],
+  "interactions": {
+    "pause": true,
+    "mode": 2,
+    "drag": true
+  },
+  "rejected": "本次结果不宜直接采信",
+  "mobile": {
+    "viewport": 390,
+    "content": 390
+  },
+  "passed": true
+}
